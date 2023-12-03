@@ -63,8 +63,40 @@
 
    <center>
          <div class="backcolor" id="button" >
-            
+            <button type="button" id="button" onclick="buttfun('bold')">
+                <b><img src="Resource/bold-xxl.png" width="15" height="15" ></b>
+            </button>
 
+            <button type="button" id="button" onclick="buttfun('underline')">
+                <u><img src="Resource/format_underline_white_192x192.png" width="28" height="18" ></u>
+            </button>
+
+            <button type="button" id="button" onclick="buttfun('italic')">
+                <i><img src="Resource/italic-xxl.png" width="15" height="15" ></i>
+            </button>
+
+            <label for="font-color-picker" class="color-picker-label">
+                <input type="color" class="color-picker" id="font-color-picker" onchange="changeFontColor(this.value)">
+                <img src="Resource/Font-color-icon.png" width="24" height="20">
+            </label>
+
+            <button type="button" id="button" onclick="alignText('left')">
+                <img src="Resource/left.png" width="15" height="15" >
+            </button>
+
+            <button type="button" id="button" onclick="alignText('center')">
+                <img src="Resource/center.png" width="15" height="15" >
+            </button>
+
+            <button type="button" id="button" onclick="alignText('right')">
+                <img src="Resource/right.png" width="15" height="15" ></button>
+                
+            <button type="button" id="button" onclick="alignText('justify')">
+                <img src="Resource/justify.png" width="15" height="15" >
+            </button>
+
+            <button type="button" id="button" onclick="undo()"><img src="Resource/undo-4-32.png" width="15" height="15" ></button>
+            <button type="button" id="button" onclick="redo()"><img src="Resource/action-redo-32.png" width="15" height="15" ></button>
         
         </div>
     </center> 
@@ -75,7 +107,61 @@
    
     
     <script>
+    let undoStack = [];
+    let redoStack = [];
+
+
+    const editor = document.getElementById('textarea');
+    function buttfun(command, value = null) {
+        document.execCommand(command, false, value);
+        saveState();
+    }
    
+    function changeFontColor(selectedColor) {
+    document.execCommand('foreColor', false, selectedColor);
+    saveState(); 
+    }
+
+    const fontColor = document.getElementById('font-color');
+    fontColor.addEventListener('input', () => {
+        buttfun('foreColor', fontColor.value);
+    });
+
+
+    function alignText(align) {
+    const validAlignments = ['left', 'center', 'right', 'justify'];
+    const editor = document.getElementById('textarea'); 
+
+    if (validAlignments.includes(align)) {
+        editor.style.textAlign = align;
+        saveState(); 
+    } else {
+        console.error('Invalid alignment value provided.');
+    }
+    }
+    
+    function saveState() {
+      const content = editor.innerHTML;
+      undoStack.push(content);
+    }
+
+    function undo() {
+      if (undoStack.length > 1) {
+        redoStack.push(undoStack.pop());
+        const content = undoStack[undoStack.length - 1];
+        editor.innerHTML = content;
+      }
+    }
+
+    function redo() {
+      if (redoStack.length > 0) {
+        const content = redoStack.pop();
+        editor.innerHTML = content;
+        undoStack.push(content);
+      }
+    }
+
+
     </script>
     
 </body>
